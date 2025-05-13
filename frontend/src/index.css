@@ -1,0 +1,93 @@
+/* Root Variables for Theme Colors */
+:root {
+  --primary: #ffcc00; /* Loader color */
+  --secondary: #222;  /* Background stripe color */
+}
+
+/* Loader Container */
+.load-man {
+  animation: load-man-travel 1.2s infinite linear;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--secondary),
+    var(--secondary) 5%,
+    transparent 5%,
+    transparent 35%
+  );
+  height: 10px;
+  width: 200px;
+
+  /* Centering */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999; /* Keep on top of everything */
+}
+
+/* Loader "Head" and "Tail" Styling */
+.load-man:after,
+.load-man:before {
+  content: "";
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  border: 25px solid var(--primary);
+  border-radius: 100%;
+  margin-top: -25px; /* Center the circles vertically */
+}
+
+/* Loader Head Animation */
+.load-man:before {
+  --close: -90; /* Degree for mouth closing */
+  animation: load-man-chomp 0.4s infinite linear;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+/* Loader Tail Animation */
+.load-man:after {
+  --close: 0;
+  animation: load-man-chomp 0.4s infinite linear;
+  border-right-color: transparent;
+  border-top-color: transparent;
+}
+
+/* Keyframe for Loader Movement */
+@keyframes load-man-travel {
+  to {
+    background-position: -200px 0; /* Create a moving stripe effect */
+  }
+}
+
+/* Keyframe for Loader Chomping Animation */
+@keyframes load-man-chomp {
+  0% {
+    transform: rotate(-45deg);
+  }
+  50% {
+    transform: rotate(calc(var(--close) * 1deg));
+  }
+  100% {
+    transform: rotate(-45deg);
+  }
+}
+
+/* Add Vendor Prefixes for Cross-Browser Support */
+@-webkit-keyframes load-man-travel {
+  to {
+    background-position: -200px 0;
+  }
+}
+
+@-webkit-keyframes load-man-chomp {
+  0% {
+    transform: rotate(-45deg);
+  }
+  50% {
+    transform: rotate(calc(var(--close) * 1deg));
+  }
+  100% {
+    transform: rotate(-45deg);
+  }
+}
