@@ -1,4 +1,3 @@
- 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
@@ -11,11 +10,9 @@ import os
 
 app = Flask(__name__)
 CORS(app)
-
-# Load Sentence-BERT model
+ 
 sbert_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-
-# Load or train Logistic Regression model
+ 
 MODEL_PATH = "logreg_model.pkl"
 
 if not os.path.exists(MODEL_PATH):
@@ -32,25 +29,21 @@ def upload_file():
     try:
         file = request.files['file']
         df = pd.read_csv(file)
-
-        # Get threshold from query param or default
+ 
         threshold = float(request.args.get('threshold', 0.7))
 
         if 'Original' not in df.columns or 'Suspect' not in df.columns:
             return jsonify({'error': "CSV must contain 'Original' and 'Suspect' columns"}), 400
-
-        # Generate embeddings and compute cosine similarity
+ 
         emb1 = sbert_model.encode(df['Original'].astype(str).tolist())
         emb2 = sbert_model.encode(df['Suspect'].astype(str).tolist())
         cosine_scores = [cosine_similarity([e1], [e2])[0][0] for e1, e2 in zip(emb1, emb2)]
 
         df['cosine_similarity'] = cosine_scores
-
-        # Use threshold to classify
+ 
         predictions = [1 if score >= threshold else 0 for score in cosine_scores]
         df['prediction'] = predictions
-
-        # Evaluation metrics if 'Label' is present
+ 
         report = {}
         if 'Label' in df.columns:
             actual = [1 if str(lbl).strip().lower() == 'plagiarized' else 0 for lbl in df['Label']]
@@ -83,7 +76,7 @@ def upload_file():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
+ 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
